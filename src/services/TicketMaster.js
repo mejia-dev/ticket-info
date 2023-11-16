@@ -5,6 +5,7 @@ export default class TicketMaster {
       const jsonifiedResponse = await response.json();
       if (!response.ok) {
         const errorMessage = `${response.status} ${response.statusText} ${jsonifiedResponse.message}`;
+        console.log(errorMessage);
         throw new Error(errorMessage);
       }
       return jsonifiedResponse;

@@ -14,6 +14,7 @@ async function getTixData(query) {
     getGiphyData(gifQuery.substring(0,49));
   } 
   else {
+    console.log(responseTix);
     printError(responseTix, query);
   }
 }
@@ -55,6 +56,7 @@ function printGif(inputData) {
 }
 
 function printError(error, query) {
+  console.log(error.status);
   document.querySelector('showResponse').innerText = null;
   document.querySelector('showResponse').innerText = `An error occurred getting data for ${query}: ${error}`;
 }
