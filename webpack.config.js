@@ -21,7 +21,7 @@ module.exports = {
       verbose: true
     }),
     new HtmlWebpackPlugin({
-      title: 'Dog Adoption',
+      title: 'Ticket Info',
       template: './src/index.html',
       inject: 'body'
     })
