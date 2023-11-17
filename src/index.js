@@ -6,17 +6,32 @@ import Giphy from './services/Giphy-services.js';
 
 //Business Logic
 
+// async function getTixData(query) {
+//   const response = await TicketMaster.getEvent(query);
+//   if (response["_embedded"]) {
+//     printTixEvents(response, query);
+//   } else {
+//     printError(response, query);
+//   }
+// }
+
 async function getTixData(query) {
-  const responseTix = await TicketMaster.getEvents(query);
-  if (responseTix["_embedded"]) {
-    const gifQuery = responseTix["_embedded"].events[0].name;
-    printTixEvents(responseTix, query);
+  const response = await TicketMaster.getEvents(query);
+  if (response["_embedded"] && (response.page.totalElements > 0)) {
+    const gifQuery = response["_embedded"].events[0].name;
+    printTixEvents(response, query);
     getGiphyData(gifQuery.substring(0,49));
-  } 
-  else {
-    console.log(responseTix);
-    printError(responseTix, query);
+  } else if (response.page && (response.page.totalElements === 0)) {
+    console.log(response.page)
+    printError("No results found",query);
+  } else {
+    console.log(response);
+    printError(response, query);
   }
+}
+
+if (weatherResponse instanceof Error) {
+  // do something with error
 }
 
 async function getGiphyData(searchTerm) {
@@ -25,24 +40,24 @@ async function getGiphyData(searchTerm) {
     printGif(responseGif);
   } 
   else {
-    printError("Can't locate GIF for this search",searchTerm);
+    printError("Can't locate GIF for this search", searchTerm);
   }
 }
 
 // UI Logic
 
-function printTixEvents(responseTix, query) {
+function printTixEvents(response, query) {
   let newAnchor = document.createElement('a');
   let newImg = document.createElement('img');
-  let displayImg = responseTix['_embedded'].events[0].images[0].url;
+  let displayImg = response['_embedded'].events[0].images[0].url;
   newImg.setAttribute("width", "50%");
   newImg.setAttribute("height", "auto");
   document.querySelector('#showResponse').innerText = `The query for ${query} results in the following events:
-  Event: ${responseTix["_embedded"].events[0].name}
-  Date: ${responseTix['_embedded'].events[0].dates.start.localDate}
-  venue: ${responseTix['_embedded'].events[0]["_embedded"].venues[0].name}
+  Event: ${response["_embedded"].events[0].name}
+  Date: ${response['_embedded'].events[0].dates.start.localDate}
+  venue: ${response['_embedded'].events[0]["_embedded"].venues[0].name}
   `;
-  newAnchor.innerHTML = `<a href="${responseTix['_embedded'].events[0].url}">${responseTix['_embedded'].events[0].url}</a><br>`;
+  newAnchor.innerHTML = `<a href="${response['_embedded'].events[0].url}">${response['_embedded'].events[0].url}</a><br>`;
   document.querySelector('#outputDiv').appendChild(newAnchor);
   newImg.setAttribute("src", displayImg);
   document.querySelector('#outputDiv').appendChild(newImg);
@@ -56,9 +71,8 @@ function printGif(inputData) {
 }
 
 function printError(error, query) {
-  console.log(error.status);
-  document.querySelector('showResponse').innerText = null;
-  document.querySelector('showResponse').innerText = `An error occurred getting data for ${query}: ${error}`;
+  document.getElementById('showResponse').innerText = null;
+  document.getElementById('showResponse').innerText = `An error occurred getting data for ${query}: ${error}`;
 }
 
 function handleTicketForm() {
